@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Route Planner</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding-top: 3rem;
+    }
+    .container {
+      max-width: 700px;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    .canteen-card {
+      margin-top: 2rem;
+    }
+
+    .notification-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #007bff;  /* Blue color */
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);  /* Added subtle shadow */
+      z-index: 9999;
+      animation: fadeInOut 6s ease-in-out forwards;  /* Set to 6s */
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      max-width: 300px;
+      transition: transform 0.3s ease, opacity 0.3s ease;  /* Smooth transition */
+    }
+
+    @keyframes fadeInOut {
+      0%   { opacity: 0; transform: translateY(-10px); }
+      20%  { opacity: 1; transform: translateY(0); }
+      80%  { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+
+    /* Delays for each notification */
+    .notification-popup:nth-of-type(1) {
+      animation-delay: 0s;  /* First notification pops immediately */
+    }
+
+    .notification-popup:nth-of-type(2) {
+      animation-delay: 10s;  /* Second notification appears after the first one */
+    }
+
+    .notification-popup:nth-of-type(3) {
+      animation-delay: 10s;  /* Third notification appears after the second */
+    }
+
+    .notification-popup:hover {
+      transform: translateY(-5px);  /* Slight lift effect on hover */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center mb-4">📍 Campus Shortest Path Finder</h1>
+
+    <form action="/find_path" method="POST">
+      <div class="mb-3">
+        <label for="start-select" class="form-label">Start Building</label>
+        <select class="form-select" id="start-select" name="start" required>
+          <option disabled selected>Select Start</option>
+          {% for name in buildings %}
+          <option value="{{ name }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+        <div id="start-description" class="text-muted mt-1"></div>
+      </div>
+
+      <div class="mb-3">
+        <label for="end-select" class="form-label">End Building</label>
+        <select class="form-select" id="end-select" name="end" required>
+          <option disabled selected>Select Destination</option>
+          {% for name in buildings %}
+          <option value="{{ name }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+        <div id="end-description" class="text-muted mt-1"></div>
+      </div>
+
+      <button class="btn btn-primary w-100" type="submit">Find Shortest Path</button>
+    </form>
+
+    {% if menu and menu["date"] %}
+    <div class="canteen-card">
+      <h4 class="text-center mt-5 mb-3">🍽 Today's Canteen Menu</h4>
+      {% for canteen, items in menu.items() if canteen != 'date' %}
+      <div class="card mb-3">
+        <div class="card-header bg-info text-white">{{ canteen }}</div>
+        <ul class="list-group list-group-flush">
+          {% for item in items %}
+          <li class="list-group-item">{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <hr class="mt-5" />
+    <div class="text-center">
+      <a href="/admin/login" class="btn btn-outline-dark mt-2">🔐 Admin Login</a>
+    </div>
+  </div>
+
+  <!-- Notification Popups (for demonstration) -->
+  {% if notifications %}
+    {% for note in notifications %}
+    <div class="notification-popup">{{ note }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <script>
+    const buildingData = {{ buildings | tojson }};
+    const startSelect = document.getElementById("start-select");
+    const endSelect = document.getElementById("end-select");
+    const startDesc = document.getElementById("start-description");
+    const endDesc = document.getElementById("end-description");
+
+    function updateDescriptions() {
+      const startVal = startSelect.value;
+      const endVal = endSelect.value;
+      startDesc.textContent = startVal && buildingData[startVal][2] || "";
+      endDesc.textContent = endVal && buildingData[endVal][2] || "";
+    }
+
+    startSelect.addEventListener("change", updateDescriptions);
+    endSelect.addEventListener("change", updateDescriptions);
+  </script>
+</body>
+</html>

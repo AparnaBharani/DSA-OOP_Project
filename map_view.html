@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Route Map</title>
+</head>
+<body>
+  <div style="text-align:center; margin-top:20px;">
+    <h2>📌 Route Map</h2>
+    {% if distance %}
+      <p>Distance: <strong>{{ distance }} km</strong></p>
+    {% endif %}
+    <iframe src="/view" width="100%" height="600px" style="border:none;"></iframe>
+    <br><a href="/">⬅️ Back</a>
+  </div>
+</body>
+</html>
